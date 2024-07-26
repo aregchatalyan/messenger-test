@@ -1,33 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
-import { useQuery, useQueryClient } from 'react-query';
-import { WS_URL } from './config';
-import { IMessage } from './types';
+import { useQuery } from 'react-query';
 import { fetcher } from './utils/fetcher';
 import { Form } from './components/Form';
 import { Messages } from './components/Message';
+import { useQuerySubscription } from './hooks/useQuerySubscription';
 
 const App = () => {
-  const queryClient = useQueryClient();
-  const { data: messages, refetch } = useQuery('messages', () => fetcher('messages'));
+  const { queryClient, socket } = useQuerySubscription();
 
   const [ newMessage, setNewMessage ] = useState('');
+  const { data: messages, refetch } = useQuery('messages', () => fetcher('messages'));
 
   useEffect(() => {
-    const socket = new WebSocket(WS_URL!);
-
-    socket.onmessage = (event) => {
-      const { type, message } = JSON.parse(event.data);
-
-      if (type === 'new_message') {
-        queryClient.setQueryData<IMessage[]>('messages', (prev) => {
-          return [ ...(prev || []), message ]
-        });
-      }
-    }
-
-    return () => socket.close();
-  }, [ queryClient ]);
+    console.log(socket?.readyState);
+  }, [ queryClient, socket ]);
 
   const onSubmit = async () => {
     const data = await fetcher('messages', {

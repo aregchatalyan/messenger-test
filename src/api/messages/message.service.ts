@@ -10,7 +10,8 @@ export class MessageService {
 
   static createMessage(text: string) {
     if (messages.length >= 9) {
-      messages.shift();
+      const message = messages.shift()!;
+      broadcast({ type: 'delete_message', message });
     }
 
     const message: IMessage = { id: Date.now(), text }
