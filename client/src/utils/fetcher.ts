@@ -1,7 +1,6 @@
+import axios from 'axios';
 import { API_URL } from '../config';
 
-export const fetcher = async (path: string, init: RequestInit = {}) => {
-  const res = await fetch(`${ API_URL }/${ path }`, { ...init } );
-
-  return res.json();
-}
+export const $api = axios.create({
+  baseURL: API_URL
+});

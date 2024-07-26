@@ -1,6 +1,6 @@
 import { createContext, FC, ReactNode, useCallback, useEffect, useState } from 'react';
-import { useQueryClient } from 'react-query';
 import { toast } from 'react-toastify';
+import { useQueryClient } from 'react-query';
 import { EventTypes, IMessage } from '../types';
 
 const WebSocketContext = createContext<WebSocket | undefined>(undefined);
@@ -11,8 +11,9 @@ interface WebSocketContextProps {
 }
 
 export const WebSocketProvider: FC<WebSocketContextProps> = ({ children, url }) => {
-  const queryClient = useQueryClient();
   const [ socket, setSocket ] = useState<WebSocket>();
+
+  const queryClient = useQueryClient();
 
   const newMessage = useCallback((message: IMessage) => {
     queryClient.setQueryData<IMessage[]>('messages', (prev) => {
