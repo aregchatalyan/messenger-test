@@ -1,27 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { toast, ToastContainer } from 'react-toastify';
+import React, { useState } from 'react';
 import { useQuery } from 'react-query';
+import { toast, ToastContainer } from 'react-toastify';
 import { fetcher } from './utils/fetcher';
 import { Form } from './components/Form';
 import { Messages } from './components/Message';
-import { useQuerySubscription } from './hooks/useQuerySubscription';
 
 const App = () => {
-  const { queryClient, socket } = useQuerySubscription();
-
   const [ newMessage, setNewMessage ] = useState('');
   const { data: messages, refetch } = useQuery('messages', () => fetcher('messages'));
-
-  useEffect(() => {
-    console.log(socket?.readyState);
-  }, [ queryClient, socket ]);
 
   const onSubmit = async () => {
     const data = await fetcher('messages', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text: newMessage })
     });
 

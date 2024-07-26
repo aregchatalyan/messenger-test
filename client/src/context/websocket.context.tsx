@@ -1,10 +1,16 @@
-import { useCallback, useEffect, useState } from 'react';
+import { createContext, FC, ReactNode, useCallback, useEffect, useState } from 'react';
 import { useQueryClient } from 'react-query';
 import { toast } from 'react-toastify';
-import { WS_URL } from '../config';
 import { EventTypes, IMessage } from '../types';
 
-export const useQuerySubscription = () => {
+const WebSocketContext = createContext<WebSocket | undefined>(undefined);
+
+interface WebSocketContextProps {
+  children: ReactNode;
+  url: string;
+}
+
+export const WebSocketProvider: FC<WebSocketContextProps> = ({ children, url }) => {
   const queryClient = useQueryClient();
   const [ socket, setSocket ] = useState<WebSocket>();
 
@@ -20,7 +26,7 @@ export const useQuerySubscription = () => {
   }, []);
 
   useEffect(() => {
-    const ws = new WebSocket(WS_URL!);
+    const ws = new WebSocket(url);
     setSocket(ws);
 
     ws.onmessage = (e) => {
@@ -37,7 +43,11 @@ export const useQuerySubscription = () => {
     }
 
     return () => ws.close();
-  }, [ queryClient, newMessage, deleteMessage ]);
+  }, [ newMessage, deleteMessage, url ]);
 
-  return { queryClient, socket }
+  return (
+    <WebSocketContext.Provider value={ socket }>
+      { children }
+    </WebSocketContext.Provider>
+  );
 }
